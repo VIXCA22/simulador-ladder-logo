@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-12",
+  "fixtures": "Circuitos propios serializados y cifrados con escritores Siemens V9; no equivalen a todas las variantes creadas por editores antiguos",
+  "cases": [
+    {
+      "case": "editor_8_0_destino_96",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_8_1_destino_96",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_8_2_destino_96",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_8_3_destino_131",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_8_4_destino_132",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_9_0_destino_131",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_9_0_destino_132",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    },
+    {
+      "case": "editor_9_0_destino_144",
+      "direct": true,
+      "ton": true,
+      "analog": true
+    }
+  ],
+  "passwordRefused": true
+}
