@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 try {
  $dataFolder=Join-Path $PSScriptRoot 'datos'
  $portFile=Join-Path $dataFolder 'puerto.txt'

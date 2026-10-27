@@ -6,3 +6,6 @@ build/
 *.tmp
 .DS_Store
 Thumbs.db
+output/
+.playwright-cli/
+Verificacion/temporal/

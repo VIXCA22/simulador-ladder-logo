@@ -1,0 +1,24 @@
+{
+  "checks": [
+    "Sin pérdidas recupera Torricelli en unidades SI",
+    "Un cuarto de altura produce la mitad de caudal ideal",
+    "Sin carga positiva no se inventa flujo ni reflujo",
+    "Propiedades tabuladas de agua a 20 °C",
+    "Régimen laminar reproduce Poiseuille con energía de salida",
+    "Mayor longitud reduce el caudal",
+    "Más pérdidas en válvulas reducen el caudal",
+    "Mayor diámetro interior aumenta el caudal",
+    "La viscosidad del agua fría aumenta las pérdidas",
+    "La contrapresión del receptor sumergido reduce la carga",
+    "K preparado reproduce el aforo individual en su altura de referencia",
+    "Ramal 0 comparte el punto de presión de la bomba",
+    "Ramal 1 comparte el punto de presión de la bomba",
+    "Abrir otro ramal cambia el punto de trabajo de la bomba",
+    "Vaciado numérico concuerda con solución analítica de Torricelli",
+    "El submodelo de gravedad conserva todo el volumen",
+    "Parámetros físicos no finitos se rechazan"
+  ],
+  "passed": 17,
+  "torricelliAnalyticSeconds": 16.8053175349845,
+  "torricelliNumericSeconds": 16.77999999999973
+}

@@ -1,4 +1,4 @@
-param([switch]$NoBrowser,[int]$Port=8768,[string]$MotorPath='')
+﻿param([switch]$NoBrowser,[int]$Port=8768,[string]$MotorPath='')
 $ErrorActionPreference='Stop'
 try {
  $appFolder=[IO.Path]::GetFullPath($PSScriptRoot)

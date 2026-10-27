@@ -1,0 +1,23 @@
+{
+  "version": "1.1.0",
+  "passed": 17,
+  "checks": [
+    "Motor de aplicación versión 1.1.0",
+    "Carga y configuración inicial: Banco_digital_analogico.lld",
+    "Contacto directo: Banco_digital_analogico.lld",
+    "Señal analógica: Banco_digital_analogico.lld",
+    "Temporizador nativo: Banco_digital_analogico.lld",
+    "Carga y configuración inicial: Banco_LOGO9.lld",
+    "Contacto directo: Banco_LOGO9.lld",
+    "Señal analógica: Banco_LOGO9.lld",
+    "Temporizador nativo: Banco_LOGO9.lld",
+    "STOP automático al detectar FIN",
+    "Historial con configuración del ensayo",
+    "Reinicio preparado en pausa",
+    "Cálculo aislado con modelo de agua",
+    "La predicción conserva el ensayo abierto",
+    "Documentación técnica disponible",
+    "Guía disponible desde la aplicación",
+    "Se puede quitar el programa y cargar otra práctica"
+  ]
+}

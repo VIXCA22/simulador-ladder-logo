@@ -1,0 +1,54 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modelo hidráulico y cálculo de tiempos</title><style>body{font:15px/1.65 Segoe UI,Arial,sans-serif;color:#20394c;background:#f2f6f8;margin:0}main{max-width:1050px;margin:28px auto;padding:32px;background:white;border:1px solid #dce6ec;border-radius:12px}h1{font-size:28px}h2{font-size:20px;margin-top:30px}h3{font-size:16px}a{color:#126ca4}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3ebf0;padding:9px}th{background:#f1f6f8}code{background:#eff4f7;padding:3px 6px;overflow-wrap:anywhere}.scroll{overflow:auto}li{margin:7px 0}.note{padding:14px;background:#eef6fa;border-radius:8px}@media(max-width:700px){main{padding:18px;margin:10px}}@media print{body{background:white}main{border:0;margin:0}}</style></head><body><main><h1>Modelo hidráulico y cálculo de tiempos</h1>
+<p>El simulador combina el programa Ladder de cada práctica con un balance de agua. El programa decide las órdenes de las válvulas, bomba y agitador; los niveles calculados actualizan los sensores asignados.</p>
+<h2>Configuración de la práctica</h2>
+<ol>
+<li>Carga el <code>.lld</code> y revisa el mapa de sensores, actuadores, START y FIN.</li>
+<li>Define los nombres de los depósitos, sus niveles iniciales y las alturas de sensores.</li>
+<li>Configura los caudales por ruta o activa el modelo de agua y revisa su geometría.</li>
+<li>Pulsa <strong>Calcular duración</strong> para estudiar la secuencia desde el estado inicial configurado.</li>
+<li>Aplica los cambios y ejecuta el ensayo para guardar sus resultados.</li>
+</ol>
+<h2>Balance volumétrico</h2>
+<p>Para cada depósito se utiliza <code>V(t + Δt) = V(t) + (ΣQentrada − ΣQsalida) Δt</code>. Los volúmenes están en litros y los caudales de la interfaz en L/s. Las transferencias se limitan al volumen disponible y a la capacidad del receptor, conservando el volumen total de agua.</p>
+<p>Para una sección uniforme, la altura del agua es <code>h = Hútil × V / Vcapacidad</code>. La cota de la superficie es <code>zsuperficie = zfondo + h</code>. Los porcentajes de sensores se refieren a la altura útil del depósito y se convierten en volúmenes equivalentes.</p>
+<h2>Caudales constantes</h2>
+<p>Cada silo tiene parámetros independientes de llenado, dosificación y retorno. La descarga del mezclador tiene su propio caudal. Las rutas de llenado abiertas comparten el caudal disponible de la bomba, proporcionalmente a sus caudales individuales.</p>
+<p>En un tramo aislado y sin cambios de caudal, <code>t = ΔV / Q</code>. El tiempo total se obtiene ejecutando la secuencia del Ladder; las operaciones simultáneas no se suman como si fueran consecutivas.</p>
+<h2>Agua: gravedad, presión y pérdidas</h2>
+<p>Los depósitos están ventilados a la atmósfera. El agua sobre el fondo produce presión manométrica <code>p = ρ g h</code>, con <code>g = 9,80665 m/s²</code>.</p>
+<p>La carga disponible de una ruta es <code>ΔH = zsuperficie_origen − max(zsalida, zsuperficie_receptor)</code>. Una salida libre utiliza su cota de descarga; una salida sumergida incorpora la contrapresión del receptor. Una carga no positiva produce caudal nulo en la dirección modelada.</p>
+<p>Se resuelve la ecuación de energía <code>ΔH + Hbomba = (1 + K + f L/D) v²/(2g)</code> y se obtiene el caudal con <code>Q = (πD²/4) v</code>. El término 1 contempla la energía de salida del chorro o su disipación al entrar al receptor; K agrupa las otras pérdidas locales.</p>
+<div class="scroll"><table>
+<tr><th>Símbolo</th><th>Magnitud</th><th>Unidad interna</th></tr>
+<tr><td>ρ</td><td>Densidad del agua</td><td>kg/m³</td></tr>
+<tr><td>μ</td><td>Viscosidad dinámica</td><td>Pa·s</td></tr>
+<tr><td>ΔH, Hbomba</td><td>Carga disponible y carga de bomba</td><td>m</td></tr>
+<tr><td>D, L, ε</td><td>Diámetro interior, longitud y rugosidad</td><td>m</td></tr>
+<tr><td>v, Q</td><td>Velocidad y caudal</td><td>m/s, m³/s</td></tr>
+<tr><td>f, K</td><td>Factor de Darcy y pérdidas locales</td><td>Adimensional</td></tr>
+</table></div>
+<p>Los milímetros y L/s de la interfaz se convierten a unidades SI para calcular. El diámetro utilizado es el interior de la conducción.</p>
+<h2>Viscosidad y rozamiento</h2>
+<p>El número de Reynolds se calcula como <code>Re = ρ v D / μ</code>. Se utiliza <code>f = 64/Re</code> en régimen laminar y la expresión de Haaland en régimen turbulento: <code>1/√f = −1,8 log₁₀[(ε/(3,7D))^1,11 + 6,9/Re]</code>. Entre Re=2300 y 4000 se aplica una interpolación continua como aproximación de transición.</p>
+<p>La densidad y viscosidad se interpolan de una tabla de agua a presión atmosférica entre 5 y 60 °C. A 20 °C se utilizan <code>ρ = 998,2 kg/m³</code> y <code>μ = 0,001002 Pa·s</code>. La temperatura modifica las pérdidas mediante estas propiedades.</p>
+<h2>Bomba y coeficientes de pérdidas</h2>
+<p>Los ramales de llenado comparten una presión de colector. Su punto de trabajo se calcula con una curva parabólica configurable: <code>Hbomba(Qtotal) = H₀ [1 − (Qtotal/Q₀)²]</code>, limitada a cargas no negativas.</p>
+<p><strong>Preparar desde caudales por ruta</strong> calcula un K efectivo por conducción a media capacidad del depósito. Las cotas y dimensiones permanecen configurables. Si la geometría impide reproducir un caudal incluso con K=0, el editor informa la incompatibilidad. Después de editar dimensiones, K no se recalcula automáticamente.</p>
+<p>Los parámetros iniciales son valores de partida. La geometría y la forma de la curva deben contrastarse con la instalación de cada práctica. Un tamaño nominal DN no determina por sí solo el diámetro interior de una manguera.</p>
+<h2>Duración y resultados</h2>
+<p>El cálculo ejecuta los bloques nativos del Ladder con sus propios temporizadores y condiciones. Finaliza al detectar FIN; si FIN no se alcanza dentro del horizonte de cálculo, el resultado se presenta como incompleto.</p>
+<p>Se muestran duración del ciclo, órdenes acumuladas de bomba y agitador, tiempo de trasiego, operaciones simultáneas y tiempos de llenado y vaciado de cada depósito. La duración medida es opcional y se utiliza únicamente para comparar resultados.</p>
+<p>Los escenarios de sensibilidad modifican la conductancia o los caudales configurados. Permiten explorar su influencia en los tiempos; no constituyen intervalos estadísticos. El historial conserva los parámetros aplicados a cada ensayo.</p>
+<h2>Alcance del modelo</h2>
+<p>El Ladder utiliza pasos virtuales de 0,1 s; el modelo de agua actualiza volúmenes en subpasos de hasta 20 ms. La velocidad de reproducción solo cambia el ritmo de visualización.</p>
+<p>Se supone agua incompresible, tuberías llenas, flujo cuasiestacionario y rutas dirigidas. Las pérdidas compartidas se representan mediante coeficientes efectivos. El retorno por V7 y los ramales de alimentación sigue la conexión representada en el esquema. No se incluyen cebado, aire atrapado, reflujo ni transitorios de presión.</p>
+<p>La precisión depende de las dimensiones, curvas y caudales de la práctica. Los tiempos de preparación, limpieza y operaciones manuales deben incorporarse por separado cuando se planifica la ocupación de una planta.</p>
+<h2>Fuentes técnicas</h2>
+<ul>
+<li><a href="https://www.gunt.de/images/datasheet/1252/RT-800-PLC-application-mixing-process-gunt-1252-pdf_1_en-GB.pdf">GUNT RT800: capacidades, componentes y distribución</a>.</li>
+<li><a href="https://archive.nptel.ac.in/content/storage2/courses/105108125/computational-hydraulics.pdf">NPTEL: balance de energía y Darcy–Weisbach</a>.</li>
+<li><a href="https://archive.nptel.ac.in/content/storage2/courses/103104043/lecture21/21_2.htm">NPTEL: pérdidas en válvulas y accesorios</a>.</li>
+<li><a href="https://doi.org/10.1115/1.3240948">Haaland: factor de fricción en flujo turbulento</a>.</li>
+<li><a href="https://assets.cambridge.org/97813165/13095/excerpt/9781316513095_excerpt.pdf">Julien: propiedades del agua, tabla 1.3</a>.</li>
+<li><a href="https://ksbresourcecenter.com/images/downloads/Marketing/Sales_Literature/Product_Literature/KSB_Selecting_Centrifugal_Pumps.pdf">KSB: curvas de bomba y punto de trabajo</a>.</li>
+</ul></main></body></html>

@@ -57,7 +57,7 @@ public class VerificarVersiones {
   password="clave_prueba_propia";Path protectedFile=folder.resolve("propio_protegido.lld");Files.write(protectedFile,new W9().save());
   boolean refused=false;try{RuntimeLogo.read(protectedFile);}catch(IOException e){refused=e.getMessage().contains("protegido");}
   check(refused,"Debe rechazar la copia propia con password");
-  Files.writeString(folder.resolve("Compatibilidad_LOGO_8_9.json"),"{\"date\":\"2026-10-12\",\"fixtures\":\"Circuitos propios serializados y cifrados con escritores Siemens V9; no equivalen a todas las variantes creadas por editores antiguos\",\"cases\":["+String.join(",",results)+"],\"passwordRefused\":true}");
+  Files.writeString(folder.resolve("Compatibilidad_LOGO_8_9.json"),"{\"date\":\""+java.time.LocalDate.now(java.time.ZoneId.of("America/Costa_Rica"))+"\",\"fixtures\":\"Circuitos propios serializados y cifrados con escritores Siemens V9; no equivalen a todas las variantes creadas por editores antiguos\",\"cases\":["+String.join(",",results)+"],\"passwordRefused\":true}");
   System.out.println("PASS: 8 formatos, directo/TON/AI-AQ y rechazo de proteccion");System.exit(0);
  }catch(Throwable e){e.printStackTrace();System.exit(1);}}
 }

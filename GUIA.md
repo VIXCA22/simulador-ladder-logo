@@ -1,86 +1,71 @@
-# Guía de uso
+# Simulador de prácticas de automatización
 
-Los requisitos y el inicio están en `README.md`.
+Aplicación portable para Windows que permite cargar programas Ladder de LOGO!, comprobar sus señales y simular una planta de mezcla con agua. Cada práctica utiliza su propio programa, mapa de entradas y salidas, nombres, sensores y parámetros hidráulicos.
 
-## Repetir la simulación o cambiar de archivo
+## Inicio
 
-Debajo del selector de archivos están los dos controles:
+1. Conserva juntas las carpetas `app`, `Ejemplos` y los archivos de la aplicación.
+2. Abre `Abrir_simulador.cmd`. Esta edición requiere una instalación local autorizada de LOGO! Soft Comfort V9; su motor no se incluye en la descarga de GitHub. La aplicación utiliza el Java de esa instalación y no necesita Python ni Node.js. Para otra ubicación usa LOGO_INSTALL o el parámetro -MotorPath de Iniciar.ps1.
+3. Selecciona un archivo `.lld` sin contraseña y pulsa **Cargar .lld**. El archivo original se conserva.
+4. Elige **Banco manual de señales** para probar entradas, salidas y temporizadores, o **Planta GUNT RT800** para simular el proceso de mezcla.
+5. Revisa el mapa de señales y los parámetros antes de ejecutar la práctica.
 
-- **Reiniciar desde cero**: conserva el archivo y el mapa, reinicia memorias, reloj y agua al estado inicial configurado, retira fallos y queda en pausa. Para repetir, pulsa START asignado o Ejecutar según el programa.
-- **Quitar archivo y cargar otro**: detiene el reloj, libera el programa, borra la traza y las señales del ensayo, y elimina únicamente su copia importada de `datos/cargas`. Conserva tu archivo original. Selecciona el nuevo `.lld` y pulsa Cargar .lld.
+La dirección local se guarda en `datos/puerto.txt`. Cierra el motor con `Cerrar_simulador.cmd`. La aplicación funciona sin conexión a internet y utiliza el navegador como interfaz.
 
-Descarga el CSV antes de reiniciar o quitar si quieres conservar la traza.
+## Configurar una práctica
 
-## Banco manual: probar un programa distinto
+- **Cambiar nombres:** permite identificar los tres tanques, el mezclador y la reserva.
+- **Ajustar sensores:** permite modificar las nueve alturas con los puntos del dibujo, deslizadores o porcentajes. Cada silo tiene sensores alto/bajo y el mezclador alto/medio/bajo.
+- **Mapa GUNT y parámetros del agua:** asigna sensores a entradas I, actuadores a salidas Q, START y FIN. Las señales ausentes quedan sin asignar.
+- **Modelo de tiempo:** configura los caudales por ruta y las propiedades del modelo de agua.
+- **Aplicar cambios y reiniciar:** guarda los ajustes e inicia un ensayo nuevo, en pausa.
 
-Después de cargar, el modo inicial es **Banco manual de señales**. Las entradas I, AI y C se descubren en el archivo; las salidas Q, AQ y marcas se muestran con sus nombres y valores. El inventario contiene los tipos y parámetros de sus bloques.
+El porcentaje del sensor se refiere a la altura útil de un depósito de sección uniforme; el editor también muestra su volumen equivalente. Debe respetarse el orden de las alturas. Las asignaciones del Ladder se revisan para cada práctica: el nombre de una señal no determina su conexión física.
 
-1. Comprueba el nombre y hardware identificado. Las entradas manuales comienzan en cero; se descartan los estados de prueba que estuvieran guardados en el archivo.
-2. Activa entradas digitales con **OFF / ON**. Estando en pausa, cada cambio calcula un ciclo virtual de 0,1 segundos para actualizar la lógica.
-3. Usa **Pulso** para mantener la entrada durante tres ciclos. En pausa, avanza el reloj para que el pulso se complete; al ejecutar, se completa automáticamente. C1 representa el cursor superior cuando ese bloque existe en el programa.
-4. Para una entrada AI, escribe un valor y pulsa **Aplicar AI…**. El valor es la magnitud interna numérica, no una tensión en voltios. La fuente AI se inyecta en su conector de simulación; los cálculos posteriores utilizan los bloques del archivo.
-5. Pulsa **Ejecutar** para avanzar continuamente. Cambia la velocidad de 1× a 50×. **Pausar** congela el reloj virtual y **Avanzar 0,1 s** calcula un único ciclo.
-6. Observa las salidas, marcas y el inventario. **Reiniciar desde cero** vuelve a cargar las memorias, pone las entradas manuales a cero y aplica M8 una vez. No es el RESET diseñado dentro del Ladder; ese RESET se prueba accionando su entrada real.
-7. Descarga el CSV antes de reiniciar o cargar otro programa. Contiene tiempos, entradas, salidas y, en modo GUNT, volúmenes. Conserva las últimas 20.000 muestras; el registro informa si se descartaron muestras antiguas.
+Los ajustes se guardan por contenido del archivo `.lld` en `datos/mapas`. **Exportar mapa** e **Importar mapa** permiten reutilizarlos con el mismo programa. Los cambios pendientes pueden descartarse antes de aplicarlos.
 
-La ejecución no depende del nombre del archivo ni de etiquetas particulares. No contiene una receta que sustituya el programa cargado. El modo manual permite probar lógicas de otros procesos, aunque la animación GUNT representa únicamente esta planta de mezcla.
+## Parámetros iniciales
 
-## Planta GUNT RT800: asignar correctamente el cableado
+Los valores iniciales son un punto de partida configurable para la planta representada. Deben ajustarse a las condiciones de cada práctica.
 
-El Ladder contiene la lógica, pero no describe qué tubería mueve cada salida. La simulación hidráulica necesita un mapa explícito. Las asignaciones iniciales siguen el proyecto RT800; las direcciones que no existen en el LAD quedan **sin asignar**.
-
-1. Selecciona **Planta GUNT RT800**. El cambio de modo inicia un ensayo nuevo, en pausa.
-2. Despliega **Mapa GUNT y parámetros del agua**.
-3. Asigna sensores a entradas I: alto/bajo de T1, T2 y T3; alto/medio/bajo del reactor; fuente disponible; STOP permitido y retorno permitido. Una entrada sin asignar no envía esa condición al programa.
-4. Asigna V1…V8, bomba y agitador a sus salidas Q. Las marcas M y salidas analógicas AQ no controlan directamente las válvulas de este modelo.
-5. Selecciona la entrada digital o cursor que utiliza el programa como START. No puede compartir la dirección de un sensor. Si el programa arranca por M8, deja START sin asignar y utiliza **Ejecutar**.
-6. Ajusta caudales, umbrales y volúmenes iniciales. Pulsa **Aplicar y reiniciar ensayo**. Se comprueban rangos, señales existentes y direcciones repetidas.
-7. Pulsa **START asignado** si el programa tiene ese pulsador, o **Ejecutar** para continuar un programa que arranca por energización. El modelo actualiza los sensores asignados a partir del agua; esos controles manuales aparecen deshabilitados.
-8. Observa el llenado y vaciado, las órdenes de bomba y agitador, la cantidad de leche dosificada y las observaciones del modelo. Verde indica orden activa del LAD; azul indica una ruta de flujo disponible. El agitador dibujado dentro del reactor gira cuando su salida asignada está activa y el reloj está en marcha; al pausar o apagar esa salida se detiene.
-9. Prueba los fallos virtuales: STOP no permitido, fuente no disponible, retorno no permitido o una válvula bloqueada. El modelo comunica las condiciones por las entradas asignadas. Si el programa no lee esas condiciones, sus órdenes pueden continuar activas; el simulador no añade un enclavamiento de protección al Ladder.
-10. **Exportar mapa** guarda JSON. **Importar mapa** permite reutilizarlo únicamente con el mismo contenido de LAD, comprobado mediante SHA-256. Renombrar el archivo no invalida el mapa; cambiar la lógica sí.
-
-### Parámetros iniciales del modelo
-
-| Elemento | Valor inicial |
+| Depósito o ruta | Valor inicial |
 |---|---:|
-| Capacidad T1, T2, T3 | 1,5 L cada uno |
-| Capacidad reactor | 7 L |
-| Capacidad reserva | 70 L |
-| Agua en reserva al iniciar | 12 L |
-| Agua en tanques/reactor al iniciar | 0 L |
-| Caudal de bomba | 0,10 L/s, repartido entre rutas abiertas |
-| Caudal de dosificación | 0,08 L/s por válvula abierta |
-| Caudal de descarga de reactor | 0,12 L/s |
-| Caudal de retorno | 0,06 L/s por tanque conectado |
-| Alto / bajo de T1…T3 | 1,45 / 0,08 L |
-| Alto / medio / bajo del reactor | 6,8 / 3,5 / 0,12 L |
+| Tanques T1, T2 y T3 | 1,5 L cada uno |
+| Mezclador | 7 L |
+| Reserva | 70 L de capacidad; 12 L al iniciar |
+| Llenado T1 / T2 / T3 | 0,154 / 0,154296 / 0,164683 L/s |
+| Dosificación T1 / T2 / T3 | 0,054406 / 0,067880 / 0,053462 L/s |
+| Retorno T1 / T2 / T3 | 0,060839 / 0,060 / 0,060 L/s |
+| Descarga del mezclador | 0,246053 L/s |
+| Caudal compartido, modo constante | 0,17 L/s |
+| Temperatura del agua | 20 °C |
 
-Los caudales y umbrales son parámetros didácticos, no mediciones de la planta real. El retorno por V1/V3/V5 con V7 abierta y bomba apagada es una hipótesis hidráulica. El modelo conserva el agua y limita los volúmenes a la capacidad; registra intentos de sobrellenado, por lo que no reproduce una fuga exterior ni un rebose real. No añade una etapa FIN, ni apaga salidas por alcanzar un límite de observación.
+**Restablecer caudales iniciales** recupera esos valores conservando nombres, sensores y volúmenes iniciales. Si está activo el modelo de agua, recalcula los coeficientes de pérdidas con la geometría configurada. Las configuraciones anteriores que utilizan caudales comunes siguen siendo compatibles.
 
-## Ejemplos incluidos
+## Calcular y ejecutar
 
-Consulta los ejemplos propios y la prueba rápida en `README.md`. Esta edición no incluye los programas del proyecto académico ni de otros integrantes.
+**Calcular duración** ejecuta el programa desde el estado inicial configurado en un ensayo aislado. Muestra duración hasta FIN, uso de bomba y agitador, tiempos de llenado y vaciado por depósito y el inicio y fin de cada movimiento. Respeta los temporizadores del archivo y las operaciones simultáneas. El cálculo no modifica el ensayo abierto.
 
-## Compatibilidad y límites
+**Duración medida (opcional)** permite comparar el resultado con una práctica real. Puede dejarse vacía. No ajusta automáticamente los caudales ni modifica los temporizadores.
 
-Admite archivos `.lld` de LOGO! 8 y 9 con bloques compatibles. Detecta automáticamente el contenedor histórico y los formatos cifrados 8.3, 8.4 y 9 según el controlador de destino, incluso cuando el editor V9 guarda para LOGO! 8. La memoria virtual se dimensiona según ese controlador. No necesitas elegir una versión ni tener instalado LOGO! 8 o 9 para usar el ZIP completo.
+En modo constante se utilizan los caudales configurados. En **Agua: gravedad, viscosidad y pérdidas**, el caudal depende de los niveles, la temperatura, los diámetros, las longitudes, las cotas, la rugosidad, las válvulas y la curva de bomba. **Preparar desde caudales por ruta** calcula coeficientes K a media capacidad del depósito. Las dimensiones iniciales de este modelo son editables y requieren validación para la instalación simulada.
 
-La prueba `Verificacion/Compatibilidad_LOGO_8_9.json` cubre ocho combinaciones: contenedores históricos con cabecera 8.0/8.1/8.2; cifrados 8.3 y 8.4; editor V9 con destino 8.3/8.4; y V9 con destino LOGO! 9. Verifica directo, TON y AI/AQ en cada caso, y el rechazo de una copia protegida. Son circuitos propios escritos con las clases Siemens instaladas de V9; no constituyen una prueba de todas las variantes producidas por editores antiguos. Las verificaciones con programas del proyecto académico quedan en el workspace original y no se distribuyen aquí.
+Consulta [Modelo hidráulico y cálculo de tiempos](Modelo_tiempo_RT800.html) para ver fórmulas, unidades, parámetros y fuentes técnicas.
 
-Un archivo válido para LOGO! puede utilizar funciones no implementadas por este banco. Se rechazan bloques detectados de comunicación de red/AS-i, pantallas de mensajes y calendarios; un formato o bloque no admitido produce un mensaje de carga y conserva el último programa válido en pausa. Los archivos protegidos no se abren: desde LOGO!, guarda una copia sin contraseña con autorización del propietario. El programa no elimina ni omite la protección.
+Utiliza **START** si el programa requiere un pulsador asignado, o **Ejecutar** si inicia por energización. **Pausar** congela el reloj; **Avanzar 0,1 s** calcula un ciclo. La velocidad de reproducción no cambia los tiempos virtuales del proceso.
 
-La simulación usa paso fijo de 0,1 s. Pulsos y temporizadores inferiores a ese paso, entradas rápidas, dispositivos remotos, calendario y retención entre reinicios requieren la simulación oficial y el equipo correspondiente. No es una certificación universal de archivos `.lld` ni una validación física. La GUI oficial de LOGO! no se verificó interactivamente en esta entrega.
+## Fin del ensayo e historial
 
-Las comprobaciones se encuentran en `Verificacion/Compatibilidad_LOGO_8_9.json`; validan el importador, el motor local y el modelo, no convierten las diferencias de los programas originales en requisitos aprobados.
+La señal FIN puede detectarse automáticamente cuando es inequívoca, o seleccionarse en el mapa. Al activarse, **STOP automático** conserva los niveles y tiempos finales y guarda el ensayo. **STOP** también permite detenerlo manualmente. Para repetir se utiliza **Reiniciar desde cero**.
 
-## Diagnóstico y mantenimiento
+El historial conserva los nombres, parámetros, volúmenes, movimientos y duración de cada ensayo. Permite descargar **Resumen CSV**, **Movimientos CSV** y **Traza completa CSV**. Reiniciar, cambiar de modo o sustituir el archivo conserva el ensayo anterior como parcial cuando corresponde.
 
-- Si falta el motor, instala una copia autorizada de LOGO! Soft Comfort V9 e indica su carpeta mediante `LOGO_INSTALL` o `-MotorPath`. Esta edición no incluye `MotorSiemens`.
-- Si el archivo no carga, revisa el mensaje: versión no admitida, protección, bloque especial o archivo incompleto. Guarda una copia desde LOGO! V9 cuando corresponda.
-- Si no cambia el agua, comprueba modo GUNT, reloj en marcha, ruta y mapa de Q. Un contacto llamado «bomba» no basta: la salida asignada debe ser la que manda la bomba.
-- Si no inicia, asigna el START que realmente utiliza el LAD. Si el programa usa M8 de primer ciclo, prueba Ejecutar.
-- Si una parada no corta salidas, comprueba el cableado lógico del programa. Pausar sólo congela la simulación.
-- Los archivos `datos/motor.log` y `datos/motor_errores.log` registran problemas del motor. Las cargas y el perfil de simulación permanecen dentro de `datos`; el paquete no necesita modificar la instalación de LOGO!.
-- Las fuentes Java del servidor y el motor están en `Fuentes`. El JAR de la aplicación ya está compilado; no se compila nada al abrirlo. El motor Siemens conserva sus binarios originales.
+Los datos están en `datos/historial`. La traza conserva las últimas 20.000 muestras; los totales y movimientos permanecen en el registro. Copia `datos/historial` y `datos/mapas` para respaldar resultados y configuraciones.
 
+## Alcance y mantenimiento
+
+La planta representada tiene tres silos, un mezclador y una reserva. El banco manual permite comprobar programas de otros procesos sin asociarlos a esta animación. Se admiten archivos compatibles de LOGO! 8 y 9; las funciones no soportadas se informan al cargar. Comunicación de red, calendarios y pantallas requieren las herramientas correspondientes.
+
+El Ladder se ejecuta con paso virtual de 0,1 s. El modelo hidráulico usa subpasos para actualizar los volúmenes. La precisión física depende de los parámetros de la práctica; las dimensiones y curvas iniciales no sustituyen las mediciones del equipo.
+
+Si el agua no cambia, revisa modo, reloj, mapa de salidas y rutas. Si la práctica no inicia, revisa START y las condiciones del programa. Si no termina, revisa FIN y los sensores. Los detalles del motor están en `datos/motor.log` y `datos/motor_errores.log`. Las fuentes y comprobaciones técnicas están en `Fuentes` y `Verificacion`.

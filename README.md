@@ -1,65 +1,71 @@
 # Simulador Ladder LOGO!
 
-Simulador local para Windows que carga archivos `.lld` de **LOGO! 8 y 9** y permite probar sus señales o una planta virtual de mezcla RT800. Interfaz en español con animación de agua, válvulas, bomba y agitador.
+**Versión 1.1.0 · Windows de 64 bits · Interfaz en español**
 
-## Descargar y ejecutar
+Aplicación local para prácticas de automatización: carga programas `.lld` de LOGO! 8 y 9, comprueba señales y simula una planta de mezcla con agua. La lógica y los temporizadores pertenecen al programa cargado; los nombres, sensores y parámetros de la práctica son configurables.
 
-1. Descarga `Simulador-Ladder-LOGO-Windows.zip` desde [Releases](https://github.com/VIXCA22/simulador-ladder-logo/releases/latest) y extrae todo su contenido.
-2. Esta edición de GitHub utiliza una instalación local autorizada de **Siemens LOGO! Soft Comfort V9**, incluidos su Java y sus bibliotecas. El motor de Siemens no se distribuye en este repositorio.
-3. Abre `Abrir_simulador.cmd`. Se detecta la instalación habitual `C:\Program Files\Siemens\LOGOComfort_V9.0`. Para otra ubicación, configura `LOGO_INSTALL` o inicia PowerShell con:
+## Descargar y abrir
+
+1. Descarga **Simulador-Ladder-LOGO-Windows.zip** desde [la última versión](https://github.com/VIXCA22/simulador-ladder-logo/releases/latest).
+2. Extrae la carpeta completa y abre **Abrir_simulador.cmd**.
+3. Carga tu `.lld`, elige banco manual o planta RT800 y revisa el mapa de señales.
+
+**La edición de GitHub requiere una instalación local autorizada de Siemens LOGO! Soft Comfort V9.** El motor de Siemens no se incluye en el repositorio ni en el ZIP. Se utiliza el Java de esa instalación; no hacen falta Python, Node.js ni internet para ejecutar la aplicación.
+
+Se detecta la ubicación habitual de LOGO! V9. Para otra ruta:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Iniciar.ps1 -MotorPath 'D:\Siemens\LOGOComfort_V9.0'
 ```
 
-4. En el navegador, carga tu `.lld`. El programa original se conserva; se trabaja con una copia local.
-5. Abre `Cerrar_simulador.cmd` para apagar el motor. Cerrar solo la pestaña no lo detiene.
+También puede utilizarse la variable `LOGO_INSTALL`. **Cerrar_simulador.cmd** detiene el motor; cerrar la pestaña solo cierra la vista.
 
-**Importante:** abrir archivos LOGO! 8 y 9 no implica ejecutar esta aplicación con las bibliotecas antiguas de V8. Esta edición usa el motor V9 para ambos formatos. No necesita Python, Node.js ni conexión a internet para funcionar.
+## Configurar la práctica
 
-## Funciones
+- **Cambiar nombres:** identifica los tanques, el mezclador y la reserva.
+- **Ajustar sensores:** modifica las nueve alturas con el dibujo, deslizadores o porcentajes.
+- **Modelo de tiempo:** configura caudales, geometría, temperatura y pérdidas. La duración medida es opcional.
+- **Aplicar cambios y reiniciar:** guarda los ajustes por programa e inicia otro ensayo.
 
-- Carga por selector o arrastre; máximo 20 MB por archivo.
-- Detección del formato histórico o cifrado según el controlador de destino, incluso V9 guardado para LOGO! 8.
-- Banco manual de entradas digitales y analógicas; visualización de salidas y bloques nativos.
-- Planta virtual RT800 con mapa editable de entradas/salidas, niveles, caudales y fallos.
-- Ejecutar, pausar, avanzar un ciclo y ajustar velocidad.
-- Reiniciar desde cero conservando archivo y mapa, o quitar el archivo para cargar otro.
-- Agitador animado según su salida asignada y el estado del reloj.
-- Exportación del ensayo a CSV y del mapa de la planta a JSON.
+El modelo de agua incluye gravedad, viscosidad, pérdidas de Darcy–Weisbach y una curva de bomba configurable. Los parámetros iniciales son valores de partida para adaptar la práctica. Consulta [el modelo hidráulico](Modelo_tiempo_RT800.html).
 
-## Prueba rápida
+## Ejecutar y revisar resultados
 
-Carga `Ejemplos/Banco_digital_analogico.lld` y usa **modo manual**:
+- Banco manual con entradas digitales y analógicas, salidas y bloques nativos.
+- Niveles instantáneos en litros y porcentaje, caudales y tiempos por depósito.
+- Ejecución, pausa, avance de 0,1 s y velocidad de reproducción.
+- STOP automático mediante la señal FIN configurada.
+- Historial permanente con parámetros, niveles, tiempos y movimientos de cada ensayo.
+- Descargas de resumen, movimientos y traza en CSV; importación y exportación de mapas JSON.
 
-| Acción | Resultado esperado |
+Los datos se crean en `datos/`, excluido del repositorio. [Guía completa](GUIA.md) · [Cambios de la versión](CAMBIOS.md).
+
+## Ejemplos incluidos
+
+`Ejemplos/Banco_digital_analogico.lld` y `Ejemplos/Banco_LOGO9.lld` son circuitos propios para practicar en modo manual:
+
+| Acción | Resultado |
 |---|---|
-| Activar I1 | Q1 se activa |
-| Mantener I1 durante 1 s de reloj virtual | Q2 se activa por TON |
-| Dar tres flancos de subida en I2 | Q3 se activa |
-| Activar I3 | Reinicia el contador |
-| Introducir 620 en AI1 | AQ1 muestra 620 |
+| Activar I1 | Se activa Q1 |
+| Mantener I1 un segundo virtual | Se activa Q2 mediante TON |
+| Aplicar tres flancos en I2 | Se activa Q3 |
+| Activar I3 | Se reinicia el contador |
+| Introducir un valor en AI1 | AQ1 refleja el valor |
 
-`Banco_LOGO9.lld` permite repetir el ensayo con destino LOGO! 9. Para temporizadores y pulsos, deja correr el reloj o usa el avance por ciclos.
+## Compilar
 
-En modo GUNT, configura primero qué Q controla cada actuador y qué I recibe cada sensor. El mapa debe corresponder a tu programa; el simulador no convierte automáticamente cualquier Ladder en una receta de mezcla.
-
-## Límites
-
-El paso de simulación es de 0,1 s. Se rechazan archivos protegidos y bloques detectados de red/AS-i, mensajes o calendarios. Pulsos más rápidos, funciones especiales y retención entre reinicios requieren la simulación oficial o el equipo correspondiente. La planta es un modelo virtual y no valida físicamente una instalación.
-
-La lógica usa las clases nativas de Siemens; las entradas analógicas se inyectan en sus conectores y el reloj es virtual. No se garantiza compatibilidad universal con todos los archivos `.lld` ni equivalencia con cada detalle de un PLC físico.
-
-## Código y compilación
-
-El código Java está en `Fuentes`; la interfaz está en `interfaz.html`. `app/simulador.jar` contiene únicamente la aplicación propia, sin bibliotecas Siemens. Para recompilar, usa `Compilar.ps1` con la instalación V9:
+Las fuentes propias están en `Fuentes` y el JAR en `app/simulador.jar`. Con LOGO! V9 disponible:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Compilar.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Compilar.ps1 -MotorPath 'D:\Siemens\LOGOComfort_V9.0'
 ```
 
-Los informes y el código de verificación de formatos están en `Verificacion`. Cubren ocho combinaciones de cabecera/controlador con directo, TON y AI/AQ. Los circuitos se escribieron con las clases Siemens V9; esto no prueba todas las variantes de editores antiguos.
+El JAR contiene únicamente las clases de esta aplicación. Las bibliotecas Siemens se cargan desde la instalación indicada. Las comprobaciones y resultados están en `Verificacion`.
 
-## Contenido
+## Alcance
 
-Este proyecto incluye solo el simulador, sus fuentes, ejemplos propios y verificación. Excluye el proyecto académico, los documentos, los programas de otros integrantes, los datos de sesiones y los componentes propietarios de Siemens. Los datos locales se crean en `datos/`, que queda fuera del control de versiones.
+La planta representa tres silos, un mezclador y una reserva. El banco manual permite comprobar otros programas compatibles. El paso del Ladder es de 0,1 s; el modelo de agua actualiza volúmenes en subpasos de hasta 20 ms. La precisión física depende de los parámetros de cada práctica.
+
+Los archivos protegidos y las funciones detectadas de comunicación, calendarios y pantallas se rechazan o informan al cargar. La compatibilidad comprobada no equivale a soporte universal de todos los archivos `.lld` ni a una certificación física del proceso.
+
+El repositorio incluye aplicación, fuentes, ejemplos propios y verificación. No contiene datos personales de sesiones ni componentes propietarios del motor.

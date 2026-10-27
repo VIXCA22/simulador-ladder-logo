@@ -1,0 +1,50 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guía de prácticas · Simulador LAD</title><style>body{font:15px/1.65 Segoe UI,Arial,sans-serif;color:#20394c;background:#f2f6f8;margin:0}main{max-width:1050px;margin:28px auto;padding:32px;background:white;border:1px solid #dce6ec;border-radius:12px}h1{font-size:28px}h2{font-size:20px;margin-top:30px}h3{font-size:16px}a{color:#126ca4}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #e3ebf0;padding:9px}th{background:#f1f6f8}code{background:#eff4f7;padding:3px 6px;overflow-wrap:anywhere}.scroll{overflow:auto}li{margin:7px 0}.note{padding:14px;background:#eef6fa;border-radius:8px}@media(max-width:700px){main{padding:18px;margin:10px}}@media print{body{background:white}main{border:0;margin:0}}</style></head><body><main><h1>Simulador de prácticas de automatización</h1>
+<p>Aplicación portable para Windows que permite cargar programas Ladder de LOGO!, comprobar sus señales y simular una planta de mezcla con agua. Cada práctica utiliza su propio programa, mapa de entradas y salidas, nombres, sensores y parámetros hidráulicos.</p>
+<h2>Inicio</h2>
+<ol>
+<li>Conserva juntas las carpetas <code>app</code>, <code>MotorSiemens</code>, <code>Ejemplos</code> y los archivos de la aplicación.</li>
+<li>Abre <code>Abrir_simulador.cmd</code>. Esta edición requiere una instalación local autorizada de LOGO! Soft Comfort V9; su motor no se incluye en la descarga de GitHub. La aplicación utiliza el Java de esa instalación y no necesita Python ni Node.js. Para otra ubicación usa LOGO_INSTALL o el parámetro -MotorPath de Iniciar.ps1.</li>
+<li>Selecciona un archivo <code>.lld</code> sin contraseña y pulsa <strong>Cargar .lld</strong>. El archivo original se conserva.</li>
+<li>Elige <strong>Banco manual de señales</strong> para probar entradas, salidas y temporizadores, o <strong>Planta GUNT RT800</strong> para simular el proceso de mezcla.</li>
+<li>Revisa el mapa de señales y los parámetros antes de ejecutar la práctica.</li>
+</ol>
+<p>La dirección local se guarda en <code>datos/puerto.txt</code>. Cierra el motor con <code>Cerrar_simulador.cmd</code>. La aplicación funciona sin conexión a internet y utiliza el navegador como interfaz.</p>
+<h2>Configurar una práctica</h2>
+<ul>
+<li><strong>Cambiar nombres:</strong> permite identificar los tres tanques, el mezclador y la reserva.</li>
+<li><strong>Ajustar sensores:</strong> permite modificar las nueve alturas con los puntos del dibujo, deslizadores o porcentajes. Cada silo tiene sensores alto/bajo y el mezclador alto/medio/bajo.</li>
+<li><strong>Mapa GUNT y parámetros del agua:</strong> asigna sensores a entradas I, actuadores a salidas Q, START y FIN. Las señales ausentes quedan sin asignar.</li>
+<li><strong>Modelo de tiempo:</strong> configura los caudales por ruta y las propiedades del modelo de agua.</li>
+<li><strong>Aplicar cambios y reiniciar:</strong> guarda los ajustes e inicia un ensayo nuevo, en pausa.</li>
+</ul>
+<p>El porcentaje del sensor se refiere a la altura útil de un depósito de sección uniforme; el editor también muestra su volumen equivalente. Debe respetarse el orden de las alturas. Las asignaciones del Ladder se revisan para cada práctica: el nombre de una señal no determina su conexión física.</p>
+<p>Los ajustes se guardan por contenido del archivo <code>.lld</code> en <code>datos/mapas</code>. <strong>Exportar mapa</strong> e <strong>Importar mapa</strong> permiten reutilizarlos con el mismo programa. Los cambios pendientes pueden descartarse antes de aplicarlos.</p>
+<h2>Parámetros iniciales</h2>
+<p>Los valores iniciales son un punto de partida configurable para la planta representada. Deben ajustarse a las condiciones de cada práctica.</p>
+<div class="scroll"><table>
+<tr><th>Depósito o ruta</th><th>Valor inicial</th></tr>
+<tr><td>Tanques T1, T2 y T3</td><td>1,5 L cada uno</td></tr>
+<tr><td>Mezclador</td><td>7 L</td></tr>
+<tr><td>Reserva</td><td>70 L de capacidad; 12 L al iniciar</td></tr>
+<tr><td>Llenado T1 / T2 / T3</td><td>0,154 / 0,154296 / 0,164683 L/s</td></tr>
+<tr><td>Dosificación T1 / T2 / T3</td><td>0,054406 / 0,067880 / 0,053462 L/s</td></tr>
+<tr><td>Retorno T1 / T2 / T3</td><td>0,060839 / 0,060 / 0,060 L/s</td></tr>
+<tr><td>Descarga del mezclador</td><td>0,246053 L/s</td></tr>
+<tr><td>Caudal compartido, modo constante</td><td>0,17 L/s</td></tr>
+<tr><td>Temperatura del agua</td><td>20 °C</td></tr>
+</table></div>
+<p><strong>Restablecer caudales iniciales</strong> recupera esos valores conservando nombres, sensores y volúmenes iniciales. Si está activo el modelo de agua, recalcula los coeficientes de pérdidas con la geometría configurada. Las configuraciones anteriores que utilizan caudales comunes siguen siendo compatibles.</p>
+<h2>Calcular y ejecutar</h2>
+<p><strong>Calcular duración</strong> ejecuta el programa desde el estado inicial configurado en un ensayo aislado. Muestra duración hasta FIN, uso de bomba y agitador, tiempos de llenado y vaciado por depósito y el inicio y fin de cada movimiento. Respeta los temporizadores del archivo y las operaciones simultáneas. El cálculo no modifica el ensayo abierto.</p>
+<p><strong>Duración medida (opcional)</strong> permite comparar el resultado con una práctica real. Puede dejarse vacía. No ajusta automáticamente los caudales ni modifica los temporizadores.</p>
+<p>En modo constante se utilizan los caudales configurados. En <strong>Agua: gravedad, viscosidad y pérdidas</strong>, el caudal depende de los niveles, la temperatura, los diámetros, las longitudes, las cotas, la rugosidad, las válvulas y la curva de bomba. <strong>Preparar desde caudales por ruta</strong> calcula coeficientes K a media capacidad del depósito. Las dimensiones iniciales de este modelo son editables y requieren validación para la instalación simulada.</p>
+<p>Consulta <a href="Modelo_tiempo_RT800.html">Modelo hidráulico y cálculo de tiempos</a> para ver fórmulas, unidades, parámetros y fuentes técnicas.</p>
+<p>Utiliza <strong>START</strong> si el programa requiere un pulsador asignado, o <strong>Ejecutar</strong> si inicia por energización. <strong>Pausar</strong> congela el reloj; <strong>Avanzar 0,1 s</strong> calcula un ciclo. La velocidad de reproducción no cambia los tiempos virtuales del proceso.</p>
+<h2>Fin del ensayo e historial</h2>
+<p>La señal FIN puede detectarse automáticamente cuando es inequívoca, o seleccionarse en el mapa. Al activarse, <strong>STOP automático</strong> conserva los niveles y tiempos finales y guarda el ensayo. <strong>STOP</strong> también permite detenerlo manualmente. Para repetir se utiliza <strong>Reiniciar desde cero</strong>.</p>
+<p>El historial conserva los nombres, parámetros, volúmenes, movimientos y duración de cada ensayo. Permite descargar <strong>Resumen CSV</strong>, <strong>Movimientos CSV</strong> y <strong>Traza completa CSV</strong>. Reiniciar, cambiar de modo o sustituir el archivo conserva el ensayo anterior como parcial cuando corresponde.</p>
+<p>Los datos están en <code>datos/historial</code>. La traza conserva las últimas 20.000 muestras; los totales y movimientos permanecen en el registro. Copia <code>datos/historial</code> y <code>datos/mapas</code> para respaldar resultados y configuraciones.</p>
+<h2>Alcance y mantenimiento</h2>
+<p>La planta representada tiene tres silos, un mezclador y una reserva. El banco manual permite comprobar programas de otros procesos sin asociarlos a esta animación. Se admiten archivos compatibles de LOGO! 8 y 9; las funciones no soportadas se informan al cargar. Comunicación de red, calendarios y pantallas requieren las herramientas correspondientes.</p>
+<p>El Ladder se ejecuta con paso virtual de 0,1 s. El modelo hidráulico usa subpasos para actualizar los volúmenes. La precisión física depende de los parámetros de la práctica; las dimensiones y curvas iniciales no sustituyen las mediciones del equipo.</p>
+<p>Si el agua no cambia, revisa modo, reloj, mapa de salidas y rutas. Si la práctica no inicia, revisa START y las condiciones del programa. Si no termina, revisa FIN y los sensores. Los detalles del motor están en <code>datos/motor.log</code> y <code>datos/motor_errores.log</code>. Las fuentes y comprobaciones técnicas están en <code>Fuentes</code> y <code>Verificacion</code>.</p></main></body></html>

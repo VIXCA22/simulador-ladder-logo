@@ -1,0 +1,3 @@
+Simulador Ladder LOGO!
+Versión 1.1.0
+Windows de 64 bits
